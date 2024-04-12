@@ -9,12 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2",
+    "ethers": "^6.11.1",
+    "next": "14.2.0",
     "react": "^18",
-    "react-dom": "^18",
-    "next": "14.2.0"
+    "react-dom": "^18"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "eslint": "^8",
-    "eslint-config-next": "14.2.0"
+    "eslint-config-next": "14.2.0",
+    "hardhat": "^2.22.2"
   }
 }
