@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
@@ -7,32 +7,38 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract NftMarketplace is IERC721Receiver,ReentrancyGuard,Ownable(msg.sender){
-    
+
 
     struct NftToList{
+        uint itemId;
         uint tokenId;
         address payable seller;
-        address payable holder;
+        address payable owner;
         uint price;
         bool isSold;
     }
 
     mapping (uint => NftToList) public ListOfNfts;
 
-    address payable owner;
+    address payable contractOwner;
     uint listingFee = 0.001 ether;
     ERC721Enumerable nft;
-    constructor(ERC721Enumerable _nft){
-        owner = payable(msg.sender);
-        
-    }    
 
-    function getNftLisstigs() public view returns(NftToList[] memory){
+    constructor(ERC721Enumerable _nft){
+        contractOwner = payable(msg.sender);
+        nft = _nft;
+    }
+    uint private _itemIds = 0;    
+    uint private _itemsSold = 0;    
+
+    function getNftListigs() public view returns(NftToList[] memory){
+        uint itemsCount = _itemIds;
+        uint unsold = _itemIds - _itemsSold;
         uint totalsupply = nft.totalSupply();
         uint index =0;
         NftToList[] memory lists = new NftToList[](totalsupply);
         for(uint i=0;i<totalsupply;i++){
-            if(ListOfNfts[i+1].holder == address(this)){
+            if(ListOfNfts[i+1].owner == address(this)){
                 uint currId = i+1;
                 NftToList storage currentItem = ListOfNfts[currId];
                 lists[currId] = currentItem;
@@ -50,18 +56,23 @@ contract NftMarketplace is IERC721Receiver,ReentrancyGuard,Ownable(msg.sender){
         return ListOfNfts[tokenId].price;
     }
 
-    function buy(uint tokenId) public payable nonReentrant{
-        uint price = ListOfNfts[tokenId].price;
+    function buy(uint itemId) public payable nonReentrant{
+        uint price = ListOfNfts[itemId].price;
+        uint tokenId = ListOfNfts[itemId].tokenId;
         require(msg.value>=price,"Send total amount to perfom buy action");
-        ListOfNfts[tokenId].seller.transfer(msg.value);
+        ListOfNfts[itemId].seller.transfer(msg.value);
+        payable(msg.sender).transfer(listingFee);
         nft.transferFrom(address(this),msg.sender,tokenId);
-        ListOfNfts[tokenId].isSold = true;
+        ListOfNfts[itemId].isSold = true;
+        _itemsSold++;
         delete ListOfNfts[tokenId];
+        delete ListOfNfts[itemId];
     }
     event NftListed(
+        uint indexed itemId,
         uint indexed tokenId,
         address payable seller,
-        address payable holder,
+        address payable owner,
         uint price,
         bool isSold
         );
@@ -71,9 +82,11 @@ contract NftMarketplace is IERC721Receiver,ReentrancyGuard,Ownable(msg.sender){
         require(ListOfNfts[tokenId].tokenId == 0,"This Nft exists in the list");
         require(price > 0, "Give valid price to list the token");
         require(msg.value == listingFee, "Transfer the listing fee of 0.001 to lis tyour token");
-        ListOfNfts[tokenId] = NftToList(tokenId,payable(msg.sender),payable(address(this)),price,false);
+        _itemIds++;
+        uint itemId = _itemIds;
+        ListOfNfts[tokenId] = NftToList(itemId,tokenId,payable(msg.sender),payable(address(this)),price,false);
         nft.transferFrom(msg.sender,address(this),tokenId);
-        emit NftListed(tokenId,payable(msg.sender),payable(address(this)),price,false);
+        emit NftListed(itemId,tokenId,payable(msg.sender),payable(address(this)),price,false);
     }
 
     function revertListing(uint tokenId) public nonReentrant{
@@ -89,8 +102,9 @@ contract NftMarketplace is IERC721Receiver,ReentrancyGuard,Ownable(msg.sender){
         address from,
         uint256 tokenId,
         bytes calldata data
-    ) external returns (bytes4){
-
+    ) external pure override returns (bytes4){
+        require(from == address(0x0),"Cant send");
+        return IERC721Receiver.onERC721Received.selector;
     }
 
 
@@ -98,9 +112,11 @@ contract NftMarketplace is IERC721Receiver,ReentrancyGuard,Ownable(msg.sender){
 
     fallback() external payable{}
     
-    function withdrawEther()  external onlyOwner{ 
-        payable(owner).transfer(address(this).balance);
-
+    function withdraw() public onlyOwner{
+        address _owner = owner();
+        uint256 amount = address(this).balance;
+        (bool _sent, ) = _owner.call{ value : amount}("");
+        require(_sent, "Failed to withdraw");
     }
     
 }
