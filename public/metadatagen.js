@@ -4,7 +4,7 @@ for (var i = 1; i < 20; i++) {
   var json = {}
   json.name = "Token #" + i;
   json.description = "This is the description for token #" + i;
-  json.image = "ipfs://QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn/" + i + ".png";
+  json.image = "ipfs://QmV6zHBQaGQF7AV2tXPjf7ML21kAvHN1yiFc9qrX3gWCmz/" + i + ".jpeg";
 
   fs.writeFileSync('' + i+ ".json", JSON.stringify(json));
 }
