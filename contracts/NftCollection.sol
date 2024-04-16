@@ -18,7 +18,7 @@ contract NftColletction is ERC721Enumerable,Ownable(msg.sender){
     constructor() ERC721("DevNft","DNFT"){}
 
     function _baseURI() internal view virtual override returns (string memory) {
-        return "ipfs://QmPY1JyfYxGZ77MoFcjA2aGzVeXyRyw6fQbsvqZTZ7GueE/";
+        return "https://ipfs.io/ipfs/QmPY1JyfYxGZ77MoFcjA2aGzVeXyRyw6fQbsvqZTZ7GueE/";
     }
 
 
