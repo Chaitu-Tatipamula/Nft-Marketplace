@@ -1,4 +1,4 @@
-import { CreateNft } from "../../components/createNft";
+import { CreateNft } from "../../components/CreateNft";
 
 
 export default function CreateNFTPage(){

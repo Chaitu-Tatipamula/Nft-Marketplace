@@ -17,6 +17,9 @@ export function NavBar() {
         <Link href="/create"  className="hover:underline">
           Create 
         </Link>
+        <Link href="/market"  className="hover:underline">
+          Market 
+        </Link>
       </div>
       <div className="gap-4 flex justify-between items-center">
         <ConnectButton />

@@ -5,10 +5,10 @@ async function sleep(ms){
 }
 
 async function main(){
-    const collection = await hre.ethers.deployContract("NftColletction")
+    const collection = await hre.ethers.deployContract("NftCollection")
     collection.waitForDeployment()
     console.log(`NFT Collection deployed at : ${collection.target}`);
-    const marketPlace = await hre.ethers.deployContract("NftMarketplace",[collection.target])
+    const marketPlace = await hre.ethers.deployContract("NFTMarketplace",[collection.target])
     marketPlace.waitForDeployment()
     console.log(`NFT MarketPlace deployed at : ${marketPlace.target}`);
 
