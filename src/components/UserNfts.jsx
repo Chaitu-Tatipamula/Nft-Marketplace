@@ -220,7 +220,7 @@ export function UserNfts() {
         {console.log(metadataList)} */}
         {/* {console.log(provider)} */}
       <h1>My NFTs</h1>
-      {!isApproved && <div>{address} is not approved on Marketplace ..!  <button className='bg-blue-600 p-2 hover:bg-blue-500 rounded-lg' onClick={approve}>Approve</button></div>}
+      {isApproved && <div>{address} is not approved on Marketplace ..!  <button className='bg-blue-600 p-2 hover:bg-blue-500 rounded-lg' onClick={approve}>Approve</button></div>}
       <div className='container p-5'>
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6'>
             {metadataList.map((metadata, index) => (
